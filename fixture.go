@@ -6,7 +6,7 @@ import (
 )
 
 type Fixture[T any] struct {
-	value T
+	value  T
 	errors []error
 }
 
@@ -22,7 +22,7 @@ func NewFixture[T any](opts ...With) *Fixture[T] {
 	for _, opt := range opts {
 		f = with(f, opt.Name, opt.Value)
 	}
-	
+
 	return f
 }
 
@@ -35,19 +35,16 @@ func with[T any, V any](g *Fixture[T], name string, value V) *Fixture[T] {
 		return g
 	}
 
+	if !reflect.TypeOf(value).AssignableTo(f.Type()) {
+		g.errors = append(g.errors, &FieldError{FieldName: name, Message: "Type mismatch"})
+		return g
+	}
+
 	if f.CanSet() {
-		if reflect.TypeOf(value).AssignableTo(f.Type()) {
-			f.Set(reflect.ValueOf(value))
-		} else {
-			g.errors = append(g.errors, &FieldError{FieldName: name, Message: "Type mismatch"})
-		}
+		f.Set(reflect.ValueOf(value))
 	} else {
-		if reflect.TypeOf(value).AssignableTo(f.Type()) {
-			fieldPtr := unsafe.Pointer(f.UnsafeAddr())
-			reflect.NewAt(f.Type(), fieldPtr).Elem().Set(reflect.ValueOf(value))
-		} else {
-			g.errors = append(g.errors, &FieldError{FieldName: name, Message: "Type mismatch and field is unaddressable"})
-		}
+		fieldPtr := unsafe.Pointer(f.UnsafeAddr())
+		reflect.NewAt(f.Type(), fieldPtr).Elem().Set(reflect.ValueOf(value))
 	}
 
 	return g

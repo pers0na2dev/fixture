@@ -19,6 +19,30 @@ func TestWithValidField(t *testing.T) {
     }
 }
 
+func TestWithValidFromConstructor(t *testing.T) {
+    fixture := NewFixture[TestStruct](
+        With{"ExportedField", 123},
+    )
+
+    if build, _ := fixture.Build(); build.ExportedField != 123 {
+        t.Errorf("Expected ExportedField to be 123, got %v", build.ExportedField)
+    }
+}
+
+func TestWithInvalidFieldType(t *testing.T) {
+    fixture := NewFixture[TestStruct]()
+    fixture.With("ExportedField", true)
+
+    _, err := fixture.Build()
+    if err == nil {
+        t.Error("Expected an error, got nil")
+    }
+
+    if err.Error() != "ExportedField: Type mismatch" {
+        t.Errorf("Expected error message to be 'ExportedField: Type mismatch', got %v", err.Error())
+    }
+}
+
 func TestWithInvalidField(t *testing.T) {
     fixture := NewFixture[TestStruct]()
     defer func() {
