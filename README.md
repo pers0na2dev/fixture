@@ -1,5 +1,7 @@
 # Generic Fixture Library for Go
 
+[![codecov](https://codecov.io/gh/pers0na2dev/fixture/graph/badge.svg?token=ZMCTDFYC11)](https://codecov.io/gh/pers0na2dev/fixture)
+
 A flexible and robust library for creating test fixtures in Go. This library simplifies the process of constructing objects for testing by allowing you to easily set up test data through a fluent API.
 
 ## Features
